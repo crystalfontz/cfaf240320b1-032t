@@ -1,0 +1,14 @@
+#Debug files
+*.a
+*.atsuo
+*.d
+*.eep
+*.elf
+*.lss
+*.map
+*.o
+*.srec
+
+#Project specific Debug folders
+*/Debug/Makefile
+*/Debug/makedep.mk

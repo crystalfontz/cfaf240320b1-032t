@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "MCU_16Bit", "MCU_16Bit\MCU_16Bit.cproj", "{8578C793-9DBF-4E2F-9FC3-EB14347D15ED}"
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "MCU_8Bit", "MCU_8Bit\MCU_8Bit.cproj", "{E8354A80-3647-41A7-A283-75D8974E0CE3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8578C793-9DBF-4E2F-9FC3-EB14347D15ED}.Debug|AVR.ActiveCfg = Debug|AVR
+		{8578C793-9DBF-4E2F-9FC3-EB14347D15ED}.Debug|AVR.Build.0 = Debug|AVR
+		{8578C793-9DBF-4E2F-9FC3-EB14347D15ED}.Release|AVR.ActiveCfg = Release|AVR
+		{8578C793-9DBF-4E2F-9FC3-EB14347D15ED}.Release|AVR.Build.0 = Release|AVR
+		{E8354A80-3647-41A7-A283-75D8974E0CE3}.Debug|AVR.ActiveCfg = Debug|AVR
+		{E8354A80-3647-41A7-A283-75D8974E0CE3}.Debug|AVR.Build.0 = Debug|AVR
+		{E8354A80-3647-41A7-A283-75D8974E0CE3}.Release|AVR.ActiveCfg = Release|AVR
+		{E8354A80-3647-41A7-A283-75D8974E0CE3}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
