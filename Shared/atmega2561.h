@@ -5,7 +5,6 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include "MMC_SD.h"
-#include <avr/delay.h>
 
 extern uint16 SectorsPerClust;
 extern uint16 FirstDataSector;
@@ -13,12 +12,9 @@ extern uint8 FAT32_Enable;
 
 struct FileInfoStruct FileInfo;
 struct direntry PictureInfo;
-uint16 totalFiles;
-
-enum { MCU16BIT = 2, MCU18BIT = 0 };
 
 // all on PORTC
-#define LCD_BL  PC0	//Backlight pin for funsies
+#define LCD_BL  PC0	//Backlight pin for funsies, I mean testing
 
 #define	LCD_RES	PC2
 #define	LCD_CS	PC4
@@ -60,9 +56,12 @@ enum { MCU16BIT = 2, MCU18BIT = 0 };
 #define LED2_OFF PORTD &= ~(1 << LED_2);
 #define LED2_ON  PORTD |=  (1 << LED_2);
 
+extern void clearScreen(void);
+
 void delay(unsigned int t);
 void displayHome(void);
 void pictureSlideShow();
+void writeColor(unsigned long color);
 void writeCommand(unsigned long command);
 void writeData(unsigned long data);
 

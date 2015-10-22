@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Atmel Studio Solution File, Format Version 11.00
-Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "MCU_16Bit", "MCU_16Bit\MCU_16Bit.cproj", "{8578C793-9DBF-4E2F-9FC3-EB14347D15ED}"
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "MCU16Bit", "MCU16Bit\MCU16Bit.cproj", "{8578C793-9DBF-4E2F-9FC3-EB14347D15ED}"
 EndProject
-Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "MCU_8Bit", "MCU_8Bit\MCU_8Bit.cproj", "{E8354A80-3647-41A7-A283-75D8974E0CE3}"
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "MCU8Bit", "MCU8Bit\MCU8Bit.cproj", "{E8354A80-3647-41A7-A283-75D8974E0CE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

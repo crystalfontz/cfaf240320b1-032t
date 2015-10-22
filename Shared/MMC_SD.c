@@ -18,7 +18,7 @@ void SPI_High(void)
 //port initialize
 void SPI_Init(void)
 {
-//#ifndef interface3WSPI
+//#ifndef SPI3W
 	DDR_INI();
 //#endif
 	SPI_Low();

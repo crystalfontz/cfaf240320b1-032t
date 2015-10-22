@@ -15,16 +15,16 @@ BYTE FAT32_Enable;
 BYTE (* FAT_ReadSector)(DWORD,BYTE *);
 BYTE (* FAT_WriteSector)(DWORD,BYTE *);
 
-//函数指针指向sd卡的读写函数
 //function pointer to the sd card read & write single block
-//wirte sector are not use in this player
-BYTE (* FAT_ReadSector)(DWORD sector, BYTE * buffer)=MMC_SD_ReadSingleBlock;//device read
-BYTE (* FAT_WriteSector)(DWORD sector, BYTE * buffer)=MMC_SD_WriteSingleBlock;//device write
+//write sector are not use in this viewer
+BYTE (* FAT_ReadSector)(DWORD sector, BYTE * buffer)=MMC_SD_ReadSingleBlock;	//device read
+BYTE (* FAT_WriteSector)(DWORD sector, BYTE * buffer)=MMC_SD_WriteSingleBlock;	//device write
 
-struct FileInfoStruct FileInfo;//temporarily buffer for file information
+//temporarily buffer for file information
+struct FileInfoStruct FileInfo;
 
-//FAT初始化，不含SD的初始化，用之前应先调用sd的初始化
-unsigned char FAT_Init()//Initialize of FAT  need initialize SD first
+//Initialization of FAT, need initialized SD first
+unsigned char FAT_Init()
 {
 	struct bootsector710 *bs  = 0;
 	struct bpb710        *bpb = 0;
@@ -36,72 +36,81 @@ unsigned char FAT_Init()//Initialize of FAT  need initialize SD first
 	DWORD Capacity;
 
 	Capacity = MMC_SD_ReadCapacity();
-	if(Capacity<0xff)return 1;
+	if(Capacity<0xff)
+		return 1;
 
-
-	if(FAT_ReadSector(0,buffer))return 1;
+	if(FAT_ReadSector(0,buffer))
+		return 1;
 	bs = (struct bootsector710 *)buffer;
 
-	pr = (struct partrecord *)((struct partsector *)buffer)->psPart;//first partition
-	hidsec = pr->prStartLBA;//the hidden sectors
+	//first partition
+	pr = (struct partrecord *)((struct partsector *)buffer)->psPart;
+	//the hidden sectors
+	hidsec = pr->prStartLBA;
 	if(hidsec >= Capacity/512)
 	{
 		hidsec = 0;
 	}
 	else 
 	{
-		if(FAT_ReadSector(pr->prStartLBA,buffer))return 1;//read the bpb sector
+		if(FAT_ReadSector(pr->prStartLBA,buffer))
+			return 1;	//read the bpb sector
 		bs = (struct bootsector710 *)buffer;
 		if(bs->bsJump[0]!=0xE9 && bs->bsJump[0]!=0xEB)
 		{
 			hidsec = 0;
-			if(FAT_ReadSector(0,buffer))return 1;//read the bpb sector
+			if(FAT_ReadSector(0,buffer))
+				return 1;	//read the bpb sector
 			bs = (struct bootsector710 *)buffer;	
 		}
 	}
 
-	if(bs->bsJump[0]!=0xE9 && bs->bsJump[0]!=0xEB)//对付没有bootsect的sd卡	//dead with the card which has no bootsect
+	//deal with card that have no boot sector
+	if(bs->bsJump[0]!=0xE9 && bs->bsJump[0]!=0xEB)
 	{
 		return 1;
 	}
 	bpb = (struct bpb710 *)bs->bsBPB;
 
 	
-	if(bpb->bpbFATsecs)//detemine thd FAT type  //do not support FAT12
+	//determine the FAT type  this does not support FAT12
+	if(bpb->bpbFATsecs)
 	{
-		FAT32_Enable=0;	//FAT16
-		FATsectors		= bpb->bpbFATsecs;//FAT占用的扇区数	//the sectors number occupied by one fat talbe
+		FAT32_Enable = 0;	//FAT16
+		//The sectors number occupied by one fat table
+		FATsectors = bpb->bpbFATsecs;
 		FirstDirClust = 2;
 	}
 	else
 	{
-		FAT32_Enable=1;	//FAT32
-		FATsectors		= bpb->bpbBigFATsecs;//FAT占用的扇区数	//the sectors number occupied by one fat talbe
+		FAT32_Enable = 1;	//FAT32
+		//The sectors number occupied by one fat table
+		FATsectors = bpb->bpbBigFATsecs;
 		FirstDirClust = bpb->bpbRootClust;
 	}
 
-	BytesPerSector	= bpb->bpbBytesPerSec;//每扇区字节数
-	SectorsPerClust	= (BYTE)bpb->bpbSecPerClust;//每簇扇区数
-	FirstFATSector	= bpb->bpbResSectors+hidsec;//第一个FAT表扇区
-	RootDirCount	= bpb->bpbRootDirEnts;//根目录项数
-	RootDirSectors	= (RootDirCount*32)>>9;//根目录占用的扇区数
-	FirstDirSector	= FirstFATSector+bpb->bpbFATs*FATsectors;//第一个目录扇区
-	FirstDataSector	= FirstDirSector+RootDirSectors;//第一个数据扇区
+	BytesPerSector	= bpb->bpbBytesPerSec;
+	SectorsPerClust	= (BYTE)bpb->bpbSecPerClust;
+	FirstFATSector	= bpb->bpbResSectors+hidsec;
+	RootDirCount	= bpb->bpbRootDirEnts;
+	RootDirSectors	= (RootDirCount*32)>>9;
+	FirstDirSector	= FirstFATSector+bpb->bpbFATs*FATsectors;
+	FirstDataSector	= FirstDirSector+RootDirSectors;
 	return 0;
 }
 
-//读一个簇中的一个扇区
 //read one sector of one cluster, parameter part indicate which sector
 unsigned char FAT_LoadPartCluster(unsigned long cluster,unsigned part,BYTE * buffer)
 {
 	DWORD sector;
-	sector=FirstDataSector+(DWORD)(cluster-2)*(DWORD)SectorsPerClust;//calculate the actual sector number
-	if(FAT_ReadSector(sector+part,buffer))return 1;
-	else return 0;
+	//calculate the actual sector number
+	sector=FirstDataSector+(DWORD)(cluster-2)*(DWORD)SectorsPerClust;
+	if(FAT_ReadSector(sector+part,buffer))
+		return 1;
+	else
+		return 0;
 }
 
-
-//读下一簇簇号
 //Return the cluster number of next cluster of file
 //Suitable for system which has limited RAM
 unsigned long FAT_NextCluster(unsigned long cluster)
@@ -109,27 +118,37 @@ unsigned long FAT_NextCluster(unsigned long cluster)
 	BYTE buffer[512];
 	DWORD sector;
 	DWORD offset;
-	if(FAT32_Enable)offset = cluster/128;
-	else offset = cluster/256;
-	if(cluster<2)return 0x0ffffff8;
-	sector=FirstFATSector+offset;//calculate the actual sector
-	if(FAT_ReadSector(sector,buffer))return 0x0ffffff8;//read fat table / return 0xfff8 when error occured
+	if(FAT32_Enable)
+		offset = cluster/128;
+	else
+		offset = cluster/256;
+
+	if(cluster<2)
+		return 0x0ffffff8;
+	//calculate the actual sector
+	sector=FirstFATSector+offset;
+	if(FAT_ReadSector(sector,buffer))
+	{
+		//read fat table / return 0xfff8 when error occurred
+		return 0x0ffffff8;
+	}
 
 	if(FAT32_Enable)
 	{
-		offset=cluster%128;//find the position
+		//find the position
+		offset=cluster%128;
 		sector=((unsigned long *)buffer)[offset];	
 	}
 	else
 	{
-		offset=cluster%256;//find the position
+		//find the position
+		offset=cluster%256;
 		sector=((unsigned int *)buffer)[offset];
 	}
-	return (unsigned long)sector;//return the cluste number
+	//return the cluster number
+	return (unsigned long)sector;
 }
 
-
-//在给定目录下查找文件
 //Find a item in the directory which specify by the parameter "cluster"
 //Return the start cluster number
 unsigned int FAT_FindItem(unsigned long cluster, BYTE *name, struct FileInfoStruct *FileInfo)
@@ -141,13 +160,24 @@ unsigned int FAT_FindItem(unsigned long cluster, BYTE *name, struct FileInfoStru
 	unsigned int offset;
 	unsigned char i;
 	struct direntry *item = 0;
-	if((cluster==0) && (FAT32_Enable == 0))// root directory
+
+	// root directory
+	if((cluster==0) && (FAT32_Enable == 0))
 	{
-		buffer=malloc(512);//apply memory
-		if(buffer==0)return 1;//if failed
+		//try to allocate memory
+		buffer=malloc(512);
+
+		//if failed, bounce out
+		if(buffer==0)
+			return 1;
+
 		for(cnt=0;cnt<RootDirSectors;cnt++)
 		{
-			if(FAT_ReadSector(FirstDirSector+cnt,buffer)){free(buffer);return 1;}
+			if(FAT_ReadSector(FirstDirSector+cnt,buffer))
+			{
+				free(buffer);
+				return 1;
+			}
 			for(offset=0;offset<512;offset+=32)
 			{
 				item=(struct direntry *)(&buffer[offset]);
@@ -155,7 +185,8 @@ unsigned int FAT_FindItem(unsigned long cluster, BYTE *name, struct FileInfoStru
 				{
 					for(i=0;i<11;i++)
 					{
-						if(buffer[offset+i]!=name[i])break;
+						if(buffer[offset+i]!=name[i])
+							break;
 					}
 					if(i==11)
 					{
@@ -171,19 +202,30 @@ unsigned int FAT_FindItem(unsigned long cluster, BYTE *name, struct FileInfoStru
 				}
 			}
 		}
-		free(buffer);//release
+		free(buffer);	//release
 	}
-	else//other folders
+	else	//other folders
 	{
 		tempclust=cluster;
 		while(1)
 		{
-			sector=FirstDataSector+(DWORD)(tempclust-2)*(DWORD)SectorsPerClust;//calculate the actual sector number
-			buffer=malloc(512);//apply memory
-			if(buffer==0)return 1;//if failed
+			//calculate the actual sector number
+			sector=FirstDataSector+(DWORD)(tempclust-2)*(DWORD)SectorsPerClust;
+
+			//try to allocate memory
+			buffer=malloc(512);
+
+			//if failed, bounce out
+			if(buffer==0)
+				return 1;
+
 			for(cnt=0;cnt<SectorsPerClust;cnt++)
 			{
-				if(FAT_ReadSector(sector+cnt,buffer)){free(buffer);return 1;}
+				if(FAT_ReadSector(sector+cnt,buffer))
+				{
+					free(buffer);
+					return 1;
+				}
 				for(offset=0;offset<512;offset+=32)
 				{
 					item=(struct direntry *)(&buffer[offset]);
@@ -191,11 +233,12 @@ unsigned int FAT_FindItem(unsigned long cluster, BYTE *name, struct FileInfoStru
 					{
 						for(i=0;i<11;i++)
 						{
-							if(buffer[offset+i]!=name[i])break;
+							if(buffer[offset+i]!=name[i])
+								break;
 						}
 						if(i==11)
 						{
-							FileInfo->StartCluster = item->deStartCluster + (((unsigned long)item->deHighClust)<<16);//don't care
+							FileInfo->StartCluster = item->deStartCluster + (((unsigned long)item->deHighClust)<<16);	//don't care
 							FileInfo->Size         = item->deFileSize;
 							FileInfo->Attr         = item->deAttributes;
 							FileInfo->Sector       = sector+cnt;
@@ -206,9 +249,10 @@ unsigned int FAT_FindItem(unsigned long cluster, BYTE *name, struct FileInfoStru
 					}
 				}
 			}
-			free(buffer);//release
-			tempclust=FAT_NextCluster(tempclust);//next cluster
-			if(tempclust == 0x0fffffff || tempclust == 0x0ffffff8 || (FAT32_Enable == 0 && tempclust == 0xffff))break;
+			free(buffer);	//release
+			tempclust=FAT_NextCluster(tempclust);	//next cluster
+			if(tempclust == 0x0fffffff || tempclust == 0x0ffffff8 || (FAT32_Enable == 0 && tempclust == 0xffff))
+				break;
 		}
 	}
 	return 1;
@@ -222,8 +266,15 @@ unsigned long FAT_OpenDir(BYTE * dir)
 	BYTE deep=0;
 	BYTE i,j;
 	DWORD cluster=0;
-	if(FAT32_Enable)cluster = FirstDirClust;
-	if(*p != '\\')return 1;//invalid path
+	if(FAT32_Enable)
+	{
+		cluster = FirstDirClust;
+	}
+
+	//invalid path
+	if(*p != '\\')
+		return 1;
+
 	while(*p)
 	{
 		if(*p == '\\')
@@ -240,11 +291,17 @@ unsigned long FAT_OpenDir(BYTE * dir)
 		j=0;
 		while(*p != '\\')
 		{
-			if((*p) >= 'a' && (*p) <= 'z')name[j] = (*p++)-0x20;
-			else name[j] = *p++;
+			if((*p) >= 'a' && (*p) <= 'z')
+				name[j] = (*p++)-0x20;
+			else
+				name[j] = *p++;
 			j++;
 		}
-		if(FAT_FindItem(cluster,name, &FileInfo))return 1;//find the directory
+		if(FAT_FindItem(cluster,name, &FileInfo))
+		{
+			//find the directory
+			return 1;
+		}
 		cluster = FileInfo.StartCluster;
 	}
 	p++;
@@ -252,38 +309,65 @@ unsigned long FAT_OpenDir(BYTE * dir)
 	j=0;
 	while(*p)
 	{
-		if(*p>='a' && *p<='z')name[j]=(*p++)-0x20;
-		else name[j]=*p++;
+		if(*p>='a' && *p<='z')
+			name[j]=(*p++)-0x20;
+		else
+			name[j]=*p++;
 		j++;
 	}
-	if(j == 0)return cluster;
-	if(FAT_FindItem(cluster,name, &FileInfo))return 1;//find the final directory
+	if(j == 0)
+		return cluster;
+		
+	if(FAT_FindItem(cluster,name, &FileInfo))
+	{
+		//find the final directory
+		return 1;
+	}
 	cluster = FileInfo.StartCluster;
 	return cluster;
 }
 
-//复制记录项信息  //copy item
-void CopyDirentruyItem(struct direntry *Desti,struct direntry *Source)
+//copy item
+void CopyDirEntryItem(struct direntry *Desti,struct direntry *Source)
 {
 	BYTE i;
-	for(i=0;i<8;i++)Desti->deName[i] = Source->deName[i];
-	for(i=0;i<3;i++)Desti->deExtension[i] = Source->deExtension[i];
+	for(i=0;i<8;i++)
+		Desti->deName[i] = Source->deName[i];
+	for(i=0;i<3;i++)
+	{
+		Desti->deExtension[i] = Source->deExtension[i];
+	}
 	Desti->deAttributes = Source->deAttributes;
 	Desti->deLowerCase = Source->deLowerCase;
 	Desti->deCHundredth = Source->deCHundredth;
-	for(i=0;i<2;i++)Desti->deCTime[i] = Source->deCTime[i];
-	for(i=0;i<2;i++)Desti->deCDate[i] = Source->deCDate[i];
-	for(i=0;i<2;i++)Desti->deADate[i] = Source->deADate[i];
+	for(i=0;i<2;i++)
+	{
+		Desti->deCTime[i] = Source->deCTime[i];
+	}
+	for(i=0;i<2;i++)
+	{
+		Desti->deCDate[i] = Source->deCDate[i];
+	}
+	for(i=0;i<2;i++)
+	{
+		Desti->deADate[i] = Source->deADate[i];
+	}
 	Desti->deHighClust = Source->deHighClust;
-	for(i=0;i<2;i++)Desti->deMTime[i] = Source->deMTime[i];
-	for(i=0;i<2;i++)Desti->deMDate[i] = Source->deMDate[i];
+	for(i=0;i<2;i++)
+	{
+		Desti->deMTime[i] = Source->deMTime[i];
+	}
+	for(i=0;i<2;i++)
+	{
+		Desti->deMDate[i] = Source->deMDate[i];
+	}
 	Desti->deStartCluster = Source->deStartCluster;
 	Desti->deFileSize = Source->deFileSize;
 }
 
-//search the file , when *count = 0 it will bring the number whole songs, when *cout != 0 the *MusicInfo will bring the infomation of the file
-BYTE Search(BYTE *dir,struct direntry *MusicInfo,WORD *Count)//当COUNT为零时，有它带回这个目录下总共有多少首音乐
-{                                                            //不为零时有MusicInfo带回第Count首歌的详细文件信息
+//search the file , when *count = 0 it will bring the number of files, when *cout != 0 the *FileInfo will bring the infomation of the file
+BYTE Search(BYTE *dir,struct direntry *FileInfo,WORD *Count)
+{
 	BYTE *buffer;
 	//BYTE buff[3];
 	DWORD sector;
@@ -294,42 +378,71 @@ BYTE Search(BYTE *dir,struct direntry *MusicInfo,WORD *Count)//当COUNT为零时，有
 	unsigned int i=0;
 	struct direntry *item = 0;
 	cluster = FAT_OpenDir(dir);
-	if(cluster == 1)return 1;
-	if(cluster==0 && FAT32_Enable==0)// root directory
+	if(cluster == 1)
+		return 1;
+	
+	// root directory
+	if(cluster==0 && FAT32_Enable==0)
 	{
-		buffer=malloc(512);//apply memory
-		if(buffer==0)return 1;//if failed
+		//try to allocate memory
+		buffer=malloc(512);
+
+		//if failed, bounce out
+		if(buffer==0)
+			return 1;
+
 		for(cnt=0;cnt<RootDirSectors;cnt++)
 		{
-			if(FAT_ReadSector(FirstDirSector+cnt,buffer)){free(buffer);return 1;}
+			if(FAT_ReadSector(FirstDirSector+cnt,buffer))
+			{
+				free(buffer);
+				return 1;
+			}
 			for(offset=0;offset<512;offset+=32)
 			{
-				item=(struct direntry *)(&buffer[offset]);//pointer convert
+				//pointer conversion
+				item=(struct direntry *)(&buffer[offset]);
+				
 				//find a valid item and display it
 				if((item->deName[0] != '.') & (item->deName[0] != 0x00) & (item->deName[0] != 0xe5) & (item->deAttributes != 0x0f))
 				{
 					if((item->deExtension[0] == 'B')&&(item->deExtension[1] == 'I')&&(item->deExtension[2] == 'N'))
 					{
-						CopyDirentruyItem(MusicInfo,item);
+						CopyDirEntryItem(FileInfo,item);
 						i++;
-						if(i==*Count){free(buffer);return 0;}	
+						if(i==*Count)
+						{
+							free(buffer);
+							return 0;
+						}
 					}
 				}
 			}
 		}
-		free(buffer);//release
+		//release
+		free(buffer);
 	}
-	else//other folders
+	else //other folders
 	{
 		tempclust=cluster;
 		while(1)
 		{
 			sector=FirstDataSector+(DWORD)(tempclust-2)*(DWORD)SectorsPerClust;//calculate the actual sector number
-			buffer=malloc(512);//apply memory
-			if(buffer==0)return 1;//if failed
+			
+			//try to allocate memory
+			buffer=malloc(512);
+
+			//if failed, bounce out
+			if(buffer==0)
+				return 1;
+			
 			for(cnt=0;cnt<SectorsPerClust;cnt++)
 			{
-				if(FAT_ReadSector(sector+cnt,buffer)){free(buffer);return 1;}
+				if(FAT_ReadSector(sector+cnt,buffer))
+				{
+					free(buffer);
+					return 1;
+				}
 				for(offset=0;offset<512;offset+=32)
 				{
 					item=(struct direntry *)(&buffer[offset]);
@@ -337,18 +450,33 @@ BYTE Search(BYTE *dir,struct direntry *MusicInfo,WORD *Count)//当COUNT为零时，有
 					{
 						if((item->deExtension[0] == 'B')&&(item->deExtension[1] == 'I')&&(item->deExtension[2] == 'N'))
 						{
-							CopyDirentruyItem(MusicInfo,item);
+							CopyDirEntryItem(FileInfo,item);
 							i++;
-							if(i==*Count){free(buffer);return 0;}	
+							if(i==*Count)
+							{
+								free(buffer);
+								return 0;
+							}	
 						}
 					}
 				}
 			}
-			free(buffer);//release
-			tempclust=FAT_NextCluster(tempclust);//next cluster
-			if(tempclust == 0x0fffffff || tempclust == 0x0ffffff8 || (FAT32_Enable == 0 && tempclust == 0xffff))break;
+			
+			//release
+			free(buffer);
+			
+			//next cluster
+			tempclust=FAT_NextCluster(tempclust);
+			
+			if(tempclust == 0x0fffffff || tempclust == 0x0ffffff8 || (FAT32_Enable == 0 && tempclust == 0xffff))
+				break;
 		}
 	}
-	if(*Count==0)*Count=i;
+	
+	if(*Count==0)
+	{
+		*Count=i;
+	}
+	
 	return 0;	
 }

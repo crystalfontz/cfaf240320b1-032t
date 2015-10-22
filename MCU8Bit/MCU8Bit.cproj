@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>6.2</ProjectVersion>
     <ToolchainName>com.Atmel.AVRGCC8.C</ToolchainName>
-    <ProjectGuid>{8578c793-9dbf-4e2f-9fc3-eb14347d15ed}</ProjectGuid>
+    <ProjectGuid>{e8354a80-3647-41a7-a283-75d8974e0ce3}</ProjectGuid>
     <avrdevice>ATmega2561</avrdevice>
     <avrdeviceseries>none</avrdeviceseries>
     <OutputType>StaticLibrary</OutputType>
@@ -14,9 +14,9 @@
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
     <AvrGccProjectExtensions>
     </AvrGccProjectExtensions>
-    <AssemblyName>MCU_16Bit</AssemblyName>
-    <Name>MCU_16Bit</Name>
-    <RootNamespace>MCU_16Bit</RootNamespace>
+    <AssemblyName>MCU8Bit</AssemblyName>
+    <Name>MCU8Bit</Name>
+    <RootNamespace>MCU8Bit</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
@@ -96,8 +96,8 @@
   <avrgcc.compiler.symbols.DefSymbols>
     <ListValues>
       <Value>DEBUG</Value>
-      <Value>F_CPU=16000000</Value>
-      <Value>INTERFACE=MCU16BIT</Value>
+      <Value>F_CPU=8000000</Value>
+      <Value>MCU8BIT</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>
@@ -117,7 +117,7 @@
   <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
 </AvrGcc>
     </ToolchainSettings>
-    <OutputFileName>MCU_16Bit</OutputFileName>
+    <OutputFileName>MCU8Bit</OutputFileName>
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputType>Executable</OutputType>
   </PropertyGroup>
@@ -130,13 +130,13 @@
       <SubType>compile</SubType>
       <Link>atmega2561.h</Link>
     </Compile>
-    <Compile Include="..\Shared\KD032QVTBN008.c">
+    <Compile Include="..\Shared\CFAF240320B1-032T.c">
       <SubType>compile</SubType>
-      <Link>KD032QVTBN008.c</Link>
+      <Link>CFAF240320B1-032T.c</Link>
     </Compile>
-    <Compile Include="..\Shared\KD032QVTBN008.h">
+    <Compile Include="..\Shared\CFAF240320B1-032T.h">
       <SubType>compile</SubType>
-      <Link>KD032QVTBN008.h</Link>
+      <Link>CFAF240320B1-032T.h</Link>
     </Compile>
     <Compile Include="..\Shared\FAT.c">
       <SubType>compile</SubType>
@@ -154,7 +154,7 @@
       <SubType>compile</SubType>
       <Link>MMC_SD.h</Link>
     </Compile>
-    <Compile Include="MCU_16Bit.c">
+    <Compile Include="MCU8Bit.c">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

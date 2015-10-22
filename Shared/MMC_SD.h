@@ -25,5 +25,6 @@ extern void		SPI_High(void);
 extern void		SPI_Low(void);
 extern uint8	SPI_WriteByte(uint8 val);
 extern void		soft_spi_send_byte(char cmd, char data);
+extern void		delay(unsigned int t);
 
 #endif /* __MMC_SD_h__ */
