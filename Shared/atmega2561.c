@@ -86,7 +86,7 @@ void pictureSlideShow()
 
 		if(slideshowFlag)
 		{
-			for (i=0;i<30;i++)	// delay for a while
+			for (i = 0; i < 3; i++)	// delay for a while
 			{
 				delay(0xFFFF);
 			}

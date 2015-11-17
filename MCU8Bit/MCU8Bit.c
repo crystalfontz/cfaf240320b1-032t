@@ -3,7 +3,13 @@
  *
  * Created: 2015-09-23 10:11:37 AM
  *  Author: max
- */ 
+ */
+
+//For the ATMEGA2561
+#define F_CPU 8000000
+
+//This sets up the code to generate the right command and data formats
+#define MCU8BIT
 
 #include "CFAF240320B1-032T.h"
 
