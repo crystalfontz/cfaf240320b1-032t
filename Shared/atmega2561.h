@@ -1,6 +1,10 @@
 #ifndef __ATMEGA2561_H__
 #define __ATMEGA2561_H__
 
+//This sets up the code to generate the right command and data formats
+//#define MCU8BIT
+#define MCU16BIT
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>

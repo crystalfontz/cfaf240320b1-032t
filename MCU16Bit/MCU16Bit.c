@@ -8,9 +8,7 @@
 //For the ATMEGA2561
 #define F_CPU 8000000
 
-//This sets up the code to generate the right command and data formats
-#define MCU16BIT
-
+//See atmega2561.h for interface definition
 #include "CFAF240320B1-032T.h"
 
 int main(void)
