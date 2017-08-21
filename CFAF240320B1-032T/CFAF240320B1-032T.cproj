@@ -104,6 +104,7 @@
       <Value>../../Shared</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
+  <avrgcc.compiler.optimization.level>Optimize most (-O3)</avrgcc.compiler.optimization.level>
   <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
   <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
   <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
@@ -116,7 +117,7 @@
   <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
 </AvrGcc>
     </ToolchainSettings>
-    <OutputFileName>MCU8Bit</OutputFileName>
+    <OutputFileName>CFAF240320B1-032T</OutputFileName>
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputType>Executable</OutputType>
   </PropertyGroup>
