@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>6.2</ProjectVersion>
     <ToolchainName>com.Atmel.AVRGCC8.C</ToolchainName>
-    <ProjectGuid>{8578c793-9dbf-4e2f-9fc3-eb14347d15ed}</ProjectGuid>
+    <ProjectGuid>{225913a9-587b-4712-aaba-ac13eeb80759}</ProjectGuid>
     <avrdevice>ATmega2561</avrdevice>
     <avrdeviceseries>none</avrdeviceseries>
     <OutputType>StaticLibrary</OutputType>
@@ -14,9 +14,9 @@
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
     <AvrGccProjectExtensions>
     </AvrGccProjectExtensions>
-    <AssemblyName>MCU16Bit</AssemblyName>
-    <Name>MCU16Bit</Name>
-    <RootNamespace>MCU16Bit</RootNamespace>
+    <AssemblyName>MCU8Bit</AssemblyName>
+    <Name>MCU8Bit</Name>
+    <RootNamespace>MCU8Bit</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
@@ -96,6 +96,7 @@
   <avrgcc.compiler.symbols.DefSymbols>
     <ListValues>
       <Value>DEBUG</Value>
+      <Value>MCU8BIT</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>
@@ -115,7 +116,7 @@
   <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
 </AvrGcc>
     </ToolchainSettings>
-    <OutputFileName>MCU16Bit</OutputFileName>
+    <OutputFileName>MCU8Bit</OutputFileName>
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputType>Executable</OutputType>
   </PropertyGroup>
@@ -127,14 +128,6 @@
     <Compile Include="..\Shared\atmega2561.h">
       <SubType>compile</SubType>
       <Link>atmega2561.h</Link>
-    </Compile>
-    <Compile Include="..\Shared\CFAF240320B1-032T.c">
-      <SubType>compile</SubType>
-      <Link>CFAF240320B1-032T.c</Link>
-    </Compile>
-    <Compile Include="..\Shared\CFAF240320B1-032T.h">
-      <SubType>compile</SubType>
-      <Link>CFAF240320B1-032T.h</Link>
     </Compile>
     <Compile Include="..\Shared\FAT.c">
       <SubType>compile</SubType>
@@ -152,7 +145,15 @@
       <SubType>compile</SubType>
       <Link>MMC_SD.h</Link>
     </Compile>
-    <Compile Include="MCU16Bit.c">
+    <Compile Include="..\Shared\ST7789V.c">
+      <SubType>compile</SubType>
+      <Link>ST7789V.c</Link>
+    </Compile>
+    <Compile Include="..\Shared\ST7789V.h">
+      <SubType>compile</SubType>
+      <Link>ST7789V.h</Link>
+    </Compile>
+    <Compile Include="CFAF240320B1-032T.c">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

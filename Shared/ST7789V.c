@@ -1,4 +1,4 @@
-#include "CFAF240320B1-032T.h"
+#include "ST7789V.h"
 // ********************************************************
 void clearScreen(void)
 {
@@ -345,13 +345,24 @@ void setDisplayWindow(int x0, int y0, int x1, int y1)
 void setInterface(void)
 {
 	//Interface select
-	// PORTF is directly mapped to IM[3:0]
-#ifdef MCU16BIT
-	PORTF = 0x00;
-#endif
+	uint8_t IM[4];
+
 #ifdef MCU8BIT
-	PORTF = 0x01;
+	PORTA = 0x00;	//Pulled low if not in use
+	IM[0] = 0;
+	IM[1] = 1;
+	IM[2] = 0;
+	IM[3] = 0;
 #endif
+#ifdef MCU16BIT
+	IM[0] = 0;
+	IM[1] = 0;
+	IM[2] = 0;
+	IM[3] = 0;
+#endif
+
+	// PORTF is directly mapped to IM[0:3]
+	PORTF = (IM[3]<<3 | IM[2]<<2 | IM[1]<<1 | IM[0]<<0);
 }
 // ********************************************************
 void writeColorBars(void)

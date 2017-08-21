@@ -45,10 +45,10 @@ void pictureSlideShow()
 		return;
 	}
 	
-	clearScreen(); // BLACK
 	do{
+		clearScreen(); // BLACK
 		//find the file
-		Search(PATH, &PictureInfo, &pics);                                         
+		Search(PATH, &PictureInfo, &pics);
 		
 		//the first cluster of the file
 		p = PictureInfo.deStartCluster + (((uint32)PictureInfo.deHighClust) << 16);
